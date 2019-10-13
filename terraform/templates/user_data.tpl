@@ -30,7 +30,6 @@ sudo mv /tmp/fly /usr/local/bin/fly
 ./usr/local/bin/fly
 #mkdir /home/ubuntu/DC
 cd /home/ubuntu/
-#wget https://raw.githubusercontent.com/starkandwayne/concourse-tutorial/master/docker-compose.yml
 git clone https://github.com/concourse/concourse-docker.git
 cd concourse-docker
 ./keys/generate
@@ -38,28 +37,6 @@ port_number="8080"
 public_ip="$(aws ec2 describe-instances --instance-ids $instance_id --output text|grep ASSOCIATION |awk '{print $3}'|head -1)"
 sudo sed -i "s/CONCOURSE_EXTERNAL_URL: http://localhost:8080/CONCOURSE_EXTERNAL_URL: http://$public_ip:$port_number" /home/ubuntu/concourse-docker/docker-compose.yml
 echo "wget concourse docker-compose $?">>/home/ubuntu/logs/user_data.log
-#sudo sed -i 's/4.2.1/5.5.1/g' /home/ubuntu/DC/docker-compose.yml
 sudo docker-compose up -d
 echo "docker-compose $?">>/home/ubuntu/logs/user_data.log
 docker-compose logs>>/home/ubuntu/logs/user_data.log
-# -- Add for Session Manager
-#aws configure
-#AWS Access Key ID [None]: AKIAIOSFODNN7EXAMPLE
-#AWS Secret Access Key [None]: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-#Default region name [None]: us-west-2
-
-
-
-
-# -- Not Used --
-# sudo apt install openssh-server
-# sudo systemctl enable ssh
-# sudo systemctl start ssh
-# sudo snap install powershell --classic
-# sudo apt install openssh-client
-# sudo apt install openssh-server
-# cd /etc/ssh/
-# sudo sed -i 's/#StrictModes yes/StrictModes no/g' sshd_config
-# sudo sed -i 's/#PubkeyAuthentication no/PubkeyAuthentication yes/g' sshd_config
-# sudo sed -i 's/Subsystem      sftp    /usr/lib/openssh/sftp-server/Subsystem powershell /usr/bin/pwsh -sshs -NoLogo -NoProfile/g' sshd_config
-# sudo service sshd restart
