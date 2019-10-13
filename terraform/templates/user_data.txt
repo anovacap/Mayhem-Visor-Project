@@ -1,0 +1,13 @@
+<powershell>
+Set-ExecutionPolicy Bypass -Scope Process -Force; `
+  iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1’))
+refreshenv
+choco install -y nodejs-lts
+choco install -y yarn
+choco install -y poshgit
+choco install -y git
+choco install -y wget
+choco install -y sed
+cd C:\Users\Administrator\Documents
+git clone https://github.com/visorgg/helloworld-electron.git
+</powershell>

@@ -144,6 +144,7 @@ resource "aws_instance" "cluster_workers" {
   instance_type = "m4.large"
   key_name      = var.keypair_name
   count         = 1
+  user_data = "${file("templates/user_data.txt")}"
 
   # TF-UPGRADE-TODO: In Terraform v0.10 and earlier, it was sometimes necessary to
   # force an interpolation expression to be interpreted as a list by wrapping it
