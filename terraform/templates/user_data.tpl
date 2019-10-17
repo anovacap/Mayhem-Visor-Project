@@ -10,9 +10,9 @@ sudo usermod -a -G docker $USER
 sudo apt-get install -y postgresql postgresql-contrib
 sudo -u postgres createuser concourse
 sudo -u postgres createdb --owner=concourse atc
-#sudo apt-get install -y python3-pip
-#sudo pip3 install awscli
-#pip3 install --upgrade --user awscli
+sudo apt install -y python3-pip
+sudo pip3 install awscli
+pip3 install --upgrade --user awscli
 cd /tmp
 mkdir /home/ubuntu/logs
 curl -LO https://github.com/concourse/concourse/releases/download/v5.5.1/concourse-5.5.1-linux-amd64.tgz -o /tmp/concourse.tgz
@@ -28,15 +28,15 @@ sudo mv /tmp/concourse* /usr/local/bin/concourse
 sudo mv /tmp/fly /usr/local/bin/fly
 ./usr/local/bin/concourse
 ./usr/local/bin/fly
-#mkdir /home/ubuntu/DC
 cd /home/ubuntu/
 git clone https://github.com/concourse/concourse-docker.git
 cd concourse-docker
 ./keys/generate
 port_number="8080"
 public_ip="$(aws ec2 describe-instances --instance-ids $instance_id --output text|grep ASSOCIATION |awk '{print $3}'|head -1)"
-sudo sed -i "s/CONCOURSE_EXTERNAL_URL: http://localhost:8080/CONCOURSE_EXTERNAL_URL: http://$public_ip:$port_number" /home/ubuntu/concourse-docker/docker-compose.yml
+sudo sed -i "s#CONCOURSE_EXTERNAL_URL: http://localhost:8080#CONCOURSE_EXTERNAL_URL: http://$public_ip:$port_number#g" /home/ubuntu/concourse-docker/docker-compose.yml
 echo "wget concourse docker-compose $?">>/home/ubuntu/logs/user_data.log
 sudo docker-compose up -d
 echo "docker-compose $?">>/home/ubuntu/logs/user_data.log
 docker-compose logs>>/home/ubuntu/logs/user_data.log
+sudo apt-get install -y emacs

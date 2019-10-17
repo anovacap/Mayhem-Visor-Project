@@ -9,5 +9,6 @@ choco install -y git
 choco install -y wget
 choco install -y sed
 cd C:\Users\Administrator\Documents
-git clone https://github.com/visorgg/helloworld-electron.git
+Start-Process -FilePath 'C:\Program Files\Git\bin\git.exe' -ArgumentList 'clone https://github.com/visorgg/helloworld-electron.git'
+Add-Content C:\Users\Administrator\Documents\test.ps1 'Write-Host "Hello World" > C:\Users\Administrator\Documents\hello.ps1'
 </powershell>
