@@ -33,7 +33,7 @@ git clone https://github.com/concourse/concourse-docker.git
 cd concourse-docker
 ./keys/generate
 port_number="8080"
-public_ip="$(aws ec2 describe-instances --instance-ids $instance_id --output text|grep ASSOCIATION |awk '{print $3}'|head -1)"
+public_ip=`curl http://169.254.169.254/latest/meta-data/public-ipv4`
 sudo sed -i "s#CONCOURSE_EXTERNAL_URL: http://localhost:8080#CONCOURSE_EXTERNAL_URL: http://$public_ip:$port_number#g" /home/ubuntu/concourse-docker/docker-compose.yml
 echo "wget concourse docker-compose $?">>/home/ubuntu/logs/user_data.log
 sudo docker-compose up -d
