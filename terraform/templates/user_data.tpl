@@ -34,6 +34,8 @@ cd concourse-docker
 ./keys/generate
 port_number="8080"
 public_ip=`curl http://169.254.169.254/latest/meta-data/public-ipv4`
+# instance id used for concourse script
+instance_id=`aws ssm describe-instance-information --query "InstanceInformationList[].InstanceId" --output text`
 sudo sed -i "s#CONCOURSE_EXTERNAL_URL: http://localhost:8080#CONCOURSE_EXTERNAL_URL: http://$public_ip:$port_number#g" /home/ubuntu/concourse-docker/docker-compose.yml
 echo "wget concourse docker-compose $?">>/home/ubuntu/logs/user_data.log
 sudo docker-compose up -d
