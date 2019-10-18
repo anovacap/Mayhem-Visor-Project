@@ -48,3 +48,4 @@ cd Concourse
 echo '#!/bin/bash' > trigger.sh
 echo 'ssh_command_id=$(aws ssm send-command --instance-ids "i-0b6df3f0de04bf148" --document-name "AWS-RunPowerShellScript" --comment "Demo run shell script on Linux Instance" --parameters commands="#!/bin/bashpowershell.exe -nologo -noprofile C:\Users\Administrator\Documents\test.ps1" --query "Command.CommandId" --output text) aws ssm list-command-invocations --command-id "$ssh_command_id" --details --query "CommandInvocations[*].CommandPlugins[*].Output[]" --output text' >> trigger.sh
 chmod u+x trigger.sh
+sed -i "s/i-0b6df3f0de04bf148/$instance_id/g" trigger.sh
