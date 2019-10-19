@@ -1,15 +1,3 @@
-/* 
-
-Main configuration file for Terraform
-
-Terraform configuration files are written in the HashiCorp Congiuration Language (HCL).
-For more information on HCL syntax, visit: 
-
-https://www.terraform.io/docs/configuration/syntax.html
-
- */
-
-# Specify that we're using AWS, using the aws_region variable
 provider "aws" {
   region  = var.aws_region
   version = "~> 2.23.0"
@@ -90,15 +78,61 @@ module "open_all_sg" {
 
 /* 
 
-Configuration for a simple EC2 cluster of 4 nodes, 
+Configuration for a simple EC2 cluster of 2 nodes, 
 within our VPC and with our open sg assigned to them
-
 For all the arguments and options, visit:
 https://www.terraform.io/docs/providers/aws/r/instance.html
 
 Note: You don't need the below resources for using the Pegasus tool
-  
  */
+
+// resource "aws_iam_instance_profile" "test_profile" {
+//   name = "test_profile"
+//   role = "${aws_iam_role.test_role.name}"
+// }
+
+// resource "aws_iam_role" "test_role" {
+//   name = "test_role"
+//   assume_role_policy = <<EOF
+//   {
+//     "Version": "2012-10-17",
+//     "Statement": [
+//         {
+//             "Action": "sts:AssumeRole",
+//             "Principal": {
+//                "Service": "ec2.amazonaws.com"
+//             },
+//             "Effect": "Allow",
+//             "Sid": ""
+//         }
+//     ]
+//   }
+// EOF
+// }
+
+// resource "aws_iam_role_policy_attachment" "test_attach" {
+//   role       = "${aws_iam_role.test_role.name}"
+//   policy_arn = "arn:aws:iam::470745135773:policy/EC2SSMwithDescribe"
+// }
+
+// resource "aws_ssm_activation" "foo" {
+//   name               = "test_ssm_activation"
+//   description        = "Test"
+//   iam_role           = "${aws_iam_role.test_role.id}"
+//   registration_limit = "2"
+//   depends_on         = ["aws_iam_role_policy_attachment.test_attach"]
+// }
+// resource "aws_iam_instance_profile" "AmazonSSMRoleForInstancesQuickSetup" {
+//     name = "AmazonSSMRoleForInstancesQuickSetup"
+//     path = "/"
+//     role = "AmazonSSMRoleForInstancesQuickSetup"
+// }
+
+// resource "aws_iam_instance_profile" "test2" {
+//     name = "test2"
+//     path = "/"
+//     role = "test2"
+// }
 
 # Configuration for a "master" instance
 resource "aws_instance" "cluster_master" {
@@ -106,6 +140,7 @@ resource "aws_instance" "cluster_master" {
   instance_type = "m4.large"
   key_name      = var.keypair_name
   count         = 1
+  iam_instance_profile = "test2"
   user_data = "${file("templates/user_data.tpl")}"
 
   # TF-UPGRADE-TODO: In Terraform v0.10 and earlier, it was sometimes necessary to
@@ -133,9 +168,9 @@ resource "aws_instance" "cluster_master" {
     HadoopRole  = "master"
     SparkRole   = "master"
   }
-  /*data "template_file" "user_data" {
-  template = "${file("templates/user_data.tpl")}"
-  }*/
+  // data "template_file" "user_data" {
+  // template = "${file("templates/user_data.tpl")}"
+  // }
 }
 
 # Configuration for 3 "worker" elastic_ips_for_instances
@@ -144,6 +179,7 @@ resource "aws_instance" "cluster_workers" {
   instance_type = "m4.large"
   key_name      = var.keypair_name
   count         = 1
+  iam_instance_profile = "AmazonSSMRoleForInstancesQuickSetup"
   user_data = "${file("templates/user_data.txt")}"
 
   # TF-UPGRADE-TODO: In Terraform v0.10 and earlier, it was sometimes necessary to
