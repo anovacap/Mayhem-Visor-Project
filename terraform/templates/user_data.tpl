@@ -34,8 +34,6 @@ cd concourse-docker
 ./keys/generate
 port_number="8080"
 public_ip=`curl http://169.254.169.254/latest/meta-data/public-ipv4`
-# instance id used for concourse script
-instance_id=`aws ssm describe-instance-information --query "InstanceInformationList[1].InstanceId" --output text --region us-west-2`
 sudo sed -i "s#CONCOURSE_EXTERNAL_URL: http://localhost:8080#CONCOURSE_EXTERNAL_URL: http://$public_ip:$port_number#g" /home/ubuntu/concourse-docker/docker-compose.yml
 echo "wget concourse docker-compose $?">>/home/ubuntu/logs/user_data.log
 sudo docker-compose up -d
@@ -46,6 +44,9 @@ cd ..
 mkdir Concourse
 cd Concourse
 echo '#!/bin/bash' > trigger.sh
-echo 'ssh_command_id=$(aws ssm send-command --instance-ids "i-0b6df3f0de04bf148" --document-name "AWS-RunPowerShellScript" --comment "Demo run shell script on Linux Instance" --parameters commands="#!/bin/bashpowershell.exe -nologo -noprofile C:\Users\Administrator\Documents\test.ps1" --query "Command.CommandId" --output text) aws ssm list-command-invocations --command-id "$ssh_command_id" --details --query "CommandInvocations[*].CommandPlugins[*].Output[]" --output text' >> trigger.sh
+echo 'ssh_command_id=$(aws ssm send-command --region "us-west-2" --instance-ids "i-0b6df3f0de04bf148" --document-name "AWS-RunPowerShellScript" --comment "Demo run shell script on Linux Instance" --parameters commands="powershell.exe -nologo -noprofile C:\Users\Administrator\Documents\test.ps1" --query "Command.CommandId" --output text) && aws ssm list-command-invocations --region "us-west-2" --command-id "$ssh_command_id" --details --query "CommandInvocations[*].CommandPlugins[*].Output[]" --output text' >> trigger.sh
 chmod u+x trigger.sh
+chown ubuntu trigger.sh
+chgrp ubuntu trigger.sh
+instance_id=`aws ssm describe-instance-information --instance-information-filter-list key=PlatformTypes,valueSet=Windows --query "InstanceInformationList[].InstanceId" --output text --region us-west-2`
 sed -i "s/i-0b6df3f0de04bf148/$instance_id/g" trigger.sh
